@@ -1,54 +1,20 @@
 const WebSocket = require('ws');
+const WebSocketPort = 33003;
 const server = new WebSocket.Server({
-    port: 33003
+    port: WebSocketPort
 });
+
+// Track the start time so the game can be timed
 let start_time = new Date();
-var http = require('http'); // Import Node.js core module
-const { time } = require('console');
 
-var webserver = http.createServer(function (req, res) {   //create web server
-    if (req.url == '/') { //check the URL of the current request
+var http = require('http');
 
-        res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.write("<html><head><meta http-equiv=\"refresh\" content=\"1\">");
-        Object.keys(robots).forEach(key => {
-            let color = "black"
-            if (robots[key].status === "booting") {
-                color = "orange"
-            }
-            if (robots[key].status === "ready") {
-                color = "green"
-            }
-            res.write(`<div style="background-color: ${color}; color: white; border-radius: 15px; padding: 20px; width: 200px; text-align: center">`);
-            res.write(String(robots[key].name));
-            res.write("<br>");
-            res.write(String(robots[key].team));
-            res.write("<br>");
-            res.write(String(robots[key].status));
-            res.write("<br>");
-            res.write(String(robots[key].ready));
-            res.write("</div>");
-        })
-        res.write('</body></html>');
-        res.end();
+console.log(`Websocket Server started at port ${WebSocketPort}`);
 
-    }
-    else
-        res.end('Invalid Request!');
-
-});
-
-webserver.listen(5000); //6 - listen for any incoming requests
-
-console.log('Node.js web server at port 5000 is running..')
-
-console.log("Websocket Server started")
 let connections = [];
-let robots = {};
+
 let whitelist_mac = [
-    'F0:08:D1:D1:72:A0', // Robot INF1B
-    '34:94:54:25:13:84', // TEST ESP32
-    'FC:F5:C4:2F:45:5C', // Robot INF1A
+    'XX:XX:XX:XX:XX:XX',
 ]
 
 sendMessage = (socket, data, client_id)=>{
@@ -59,11 +25,6 @@ sendMessage = (socket, data, client_id)=>{
 server.on('connection', function (socket, client) {
     console.log(client.headers)
     connections.push(socket);
-    //socket.send("Hallo Pieter post hier")
-    // client_ip = client.socket.remoteAddress.split(":")
-    // client_ip = client_ip[client_ip.length-1]
-    // console.log(`Checking if user on ${client_ip} has rights to connect`)
-    // When you receive a message, send that message to every socket.
     socket.on('message', function (msg) {
         let data = {}
         // return;
